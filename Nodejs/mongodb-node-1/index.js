@@ -23,3 +23,13 @@ const app = require("./app");
 app.listen(process.env.PORT, () => {
   logSuccess("Server running on PORT " + process.env.PORT);
 });
+
+process.on('unhandledRejection', err => {
+  logError('Unhandled rejection !. Shutting Down...')
+  process.exit(1);
+})
+
+process.on('uncaughtException', err => {
+  logError('Uncaught exception !. Shutting Down...')
+  process.exit(1);
+})
