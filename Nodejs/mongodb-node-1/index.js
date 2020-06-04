@@ -6,7 +6,7 @@ dotenv.config({
   path: "./config.env",
 });
 mongoose
-  .connect(process.env.DB_PROD_URL, {
+  .connect(process.env.DB_DEV_URL, {
     useCreateIndex: true,
     useUnifiedTopology: true,
     useNewUrlParser: true,
