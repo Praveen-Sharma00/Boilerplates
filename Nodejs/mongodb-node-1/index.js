@@ -17,6 +17,22 @@ mongoose
     })
 
 const app = require('./app')
-app.listen(process.env.PORT,()=>{
+
+const server = app.listen(process.env.PORT,()=>{
     console.log('Server listening on port ' + process.env.PORT)
+})
+
+process.on('unhandledRejection',err=>{
+    console.log(err.name , err.message)
+    console.log('UNHANDLED_REJECTION ! , Shutting Down...')
+    server.close(()=>{
+        process.exit(1)
+    }) 
+})
+process.on('uncaughtException',err=>{
+    console.log(err.name , err.message)
+    console.log('UNCAUGHT_EXCEPTION ! , Shutting Down...')
+    server.close(()=>{
+        process.exit(1)
+    }) 
 })
