@@ -17,7 +17,7 @@ const handleValidationError = (error) => {
     return new AppError(message, 400)
 }
 
-const handleDuplicateError = (error) => {
+const handleDuplicateError = (err) => {
     const value = err.errmsg.match(/(["'])(?:(?=(\\?))\2.)*?\1/)[0]
     const message = `Duplicate field value : ${value}. Please use another `
     return new AppError(message, 400)
@@ -25,7 +25,6 @@ const handleDuplicateError = (error) => {
 
 
 const sendDevError = (err, res) => {
-
     return res
         .status(err.statusCode)
         .json({
@@ -56,13 +55,10 @@ module.exports = (err, req, res, next) => {
     err.statusCode = err.statusCode || 500
     err.status = err.status || 'error'
 
-
     if (process.env.NODE_ENV === 'development') {
         sendDevError(err, res)
     } else if (process.env.NODE_ENV === 'production') {
         let error = { ...err }
-        // res.json({ error: Object.values(error.errors) })
-        // console.log("error :", error)
         if (err.hasOwnProperty('errors') || err.name === 'ValidationError')
             error = handleValidationError(err)
         else if (err.name === 'CastError')
