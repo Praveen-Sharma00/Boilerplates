@@ -6,8 +6,14 @@ const handleCastError = (error) => {
 }
 
 const handleValidationError = (error) => {
-    const errors = Object.values(error.errors).map(e => e.message)
-    const message = `Invalid input data ${errors.join('. ')}.`
+    let errors = Object.values(error.errors)
+    const msg = errors.map((e) => {
+        if (e.hasOwnProperty('kind') && e['kind'] === 'required') {
+            return e['path'] + ' is a required field !'
+        }
+        return e['properties']['message']
+    })
+    const message = `${msg.join('. ')}`
     return new AppError(message, 400)
 }
 
@@ -19,9 +25,11 @@ const handleDuplicateError = (error) => {
 
 
 const sendDevError = (err, res) => {
+
     return res
         .status(err.statusCode)
         .json({
+            err: err,
             status: err.status,
             message: err.message,
             stack: err.stack,
@@ -53,14 +61,16 @@ module.exports = (err, req, res, next) => {
         sendDevError(err, res)
     } else if (process.env.NODE_ENV === 'production') {
         let error = { ...err }
-        if (err.name === 'ValidationError')
+        // res.json({ error: Object.values(error.errors) })
+        // console.log("error :", error)
+        if (err.hasOwnProperty('errors') || err.name === 'ValidationError')
             error = handleValidationError(err)
         else if (err.name === 'CastError')
             error = handleCastError(err)
         else if (err.code === 11000)
             error = handleDuplicateError(err)
 
-        sendProdError(err, res)
+        sendProdError(error, res)
     }
 
 }
