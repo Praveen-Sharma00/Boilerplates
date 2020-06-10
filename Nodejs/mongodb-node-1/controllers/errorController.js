@@ -35,6 +35,7 @@ const sendDevError = (err, res) => {
         })
 }
 const sendProdError = (err, res) => {
+
     if (err.isOperational) {
         res.status(err.statusCode)
             .json({
@@ -58,15 +59,14 @@ module.exports = (err, req, res, next) => {
     if (process.env.NODE_ENV === 'development') {
         sendDevError(err, res)
     } else if (process.env.NODE_ENV === 'production') {
-        let error = { ...err }
         if (err.hasOwnProperty('errors') || err.name === 'ValidationError')
-            error = handleValidationError(err)
-        else if (err.name === 'CastError')
-            error = handleCastError(err)
-        else if (err.code === 11000)
-            error = handleDuplicateError(err)
+            err = handleValidationError(err)
+        else if (err.hasOwnProperty("name") && err.name === 'CastError')
+            err = handleCastError(err)
+        else if (err.hasOwnProperty("code") && err.code === 11000)
+            err = handleDuplicateError(err)
 
-        sendProdError(error, res)
+        sendProdError(err, res)
     }
 
 }
