@@ -20,7 +20,7 @@ module.exports = asyncHandler(async (req, res, next) => {
     }
     const decode = await decodeToken(token)
     const authUser = await User.findById(decode.id)
-    console.log(authUser)
+
     if (!authUser) {
         return next(new AppError("The user does not exist !", 401))
     }
