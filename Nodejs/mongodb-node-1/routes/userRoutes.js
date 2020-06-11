@@ -15,8 +15,11 @@ router.route('/settings')
         authoriseUser.restrictTo('admin'),
         userController.settings)
 
-router.post('/forgot-password', authController.forgotPassword)
-router.patch('/reset-password/:token', authController.resetPassword)
+router.route('/forgot-password')
+    .post(authController.forgotPassword)
+
+router.route('/reset-password/:token')
+    .patch(authController.resetPassword)
 
 router.route('/update-password')
     .patch(authenticateUser, authController.updatePassword)
