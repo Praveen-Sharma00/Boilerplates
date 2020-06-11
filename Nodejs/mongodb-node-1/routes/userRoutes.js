@@ -18,4 +18,7 @@ router.route('/settings')
 router.post('/forgot-password', authController.forgotPassword)
 router.patch('/reset-password/:token', authController.resetPassword)
 
+router.route('/update-password')
+    .patch(authenticateUser, authController.updatePassword)
+
 module.exports = router
