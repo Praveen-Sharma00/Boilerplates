@@ -14,17 +14,19 @@ const signToken = id => {
         expiresIn: process.env.JWT_EXPIRES_IN
     })
 }
+
+const createSendToken = (user, statusCode, res) => {
+    const token = signToken(user._id)
+    res.status(statusCode).json({
+        status: 'success',
+        data: { user, token }
+    })
+}
 exports.signup = asyncHandler(async (req, res, next) => {
     const newUser = new User(req.body)
-    const token = signToken(newUser._id)
+
     await newUser.save();
-    res.status(200).json({
-        status: 'success',
-        data: {
-            user: newUser,
-            token: token
-        }
-    })
+    createSendToken(newUser, 201, res)
 })
 
 exports.login = asyncHandler(async (req, res, next) => {
@@ -41,11 +43,7 @@ exports.login = asyncHandler(async (req, res, next) => {
         return next(new AppError('Incorrect email or password', 400))
     }
 
-    const token = signToken(user._id)
-    res.status(200).json({
-        status: "success",
-        token: token
-    })
+    createSendToken(user, 200, res)
 })
 
 exports.resetPassword = asyncHandler(async (req, res, next) => {
@@ -67,11 +65,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
     await user.save()
 
-    const token = signToken(user._id)
-    res.status(200).json({
-        status: "success",
-        token: token
-    })
+    createSendToken(user, 200, res)
 })
 
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
@@ -106,4 +100,16 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
         return next(new AppError('There was an error sending email. Try again later !', 500))
     }
 
+})
+
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id).select('+password')
+    if (!(user.correctPassword(req.body.passwordConfirm, user.password))) {
+        return next(new AppError('Your current password is incorrect !', 401))
+    }
+    user.password = req.body.password
+    user.passwordConfirm = req.body.passwordConfirm
+    user.passwordChangedAt = Date.now()
+    await user.save()
+    createSendToken(user, 200, res)
 })
