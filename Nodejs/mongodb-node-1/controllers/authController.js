@@ -54,10 +54,10 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ passwordResetToken: hashedToken, passwordResetExpires: { $gt: Date.now() } })
 
     if (!user) {
-        return new AppError('Token in invalid or expired !')
+        return next(new AppError('Token in invalid or expired !'))
     }
     if (req.body.password !== req.body.passwordConfirm) {
-        return new AppError('Passwords dont match !')
+        return next(new AppError('Passwords dont match !'))
     }
     user.password = req.body.password
     user.passwordConfirm = req.body.password
