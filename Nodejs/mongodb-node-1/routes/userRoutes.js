@@ -2,10 +2,10 @@ const express = require('express')
 const router = express.Router()
 
 const userController = require('../controllers/userController')
-const verifyToken = require('../middlewares/verifyToken')
+const authenticateUser = require('../middlewares/authenticateUser')
 
 router.route('/home')
-    .get(verifyToken, userController.home)
+    .get(authenticateUser, userController.home)
 
 
 module.exports = router
