@@ -23,6 +23,13 @@ const handleDuplicateError = (err) => {
     return new AppError(message, 400)
 }
 
+const handleJWTError = () => {
+    return new AppError("Invalid token. Please login", 401)
+}
+
+const handleTokenExpiredError = () => {
+    return new AppError("Token is expired. Please login", 401)
+}
 
 const sendDevError = (err, res) => {
     return res
@@ -65,7 +72,10 @@ module.exports = (err, req, res, next) => {
             err = handleCastError(err)
         else if (err.hasOwnProperty("code") && err.code === 11000)
             err = handleDuplicateError(err)
-
+        else if (err.name === 'JsonWebTokenError')
+            err = handleJWTError()
+        else if (err.name === 'TokenExpiredError')
+            err = handleTokenExpiredError()
         sendProdError(err, res)
     }
 
