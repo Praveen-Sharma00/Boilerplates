@@ -17,5 +17,7 @@ export default class Response {
         responseObj['message'] = message || 'failed';
         responseObj['statusCode'] = code || HttpStatus.NOT_FOUND;
         responseObj['extra'] = extra || {};
+
+        res.status(responseObj.statusCode).json(responseObj)
     }
 }
