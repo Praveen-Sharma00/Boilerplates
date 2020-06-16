@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import validator from 'validator'
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -10,19 +11,24 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         validate: [validator.isEmail, 'Please provide a valid Email']
     },
+    photo:{
+      type:String, default:null
+    },
     password: {
         type: String,
         required: true,
+        minLength:6
     },
     passwordConfirm: {
         type: String,
         required: true,
-        validate: {
-            validator: function (el) {
-                return el === this.password
-            },
-            message: "Passwords dont match !"
-        }
+        minLength:6,
+        // validate: {
+        //     validator: function (el) {
+        //         return el === this.password
+        //     },
+        //     message: "Passwords dont match !"
+        // }
     },
     passwordResetToken: {
         type: String
