@@ -18,12 +18,12 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minLength: 4
+        minlength: 4
     },
     passwordConfirm: {
         type: String,
         required: true,
-        minLength: 4,
+        minlength: 4,
         validate: {
             validator: function (el) {
                 return el === this.password
