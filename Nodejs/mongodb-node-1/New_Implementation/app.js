@@ -4,6 +4,9 @@ import rateLimit from 'express-rate-limit'
 import xss from 'xss-clean'
 import mongoSanitize from 'express-mongo-sanitize'
 
+import AppError from './utils/appError'
+import globalErrorHandler from './controllers/errorController'
+
 import authRoutes from './routes/authRoutes'
 const app = express()
 
@@ -21,5 +24,9 @@ app.use(mongoSanitize())
 app.use(xss())
 
 app.use('/api/v1/auth', authRoutes)
+app.all('*',(req, res,next) => {
+    return next(new AppError('Route not found !',404))
+})
+app.use(globalErrorHandler)
 export default app;
 
