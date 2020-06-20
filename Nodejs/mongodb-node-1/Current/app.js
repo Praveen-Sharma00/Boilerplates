@@ -7,6 +7,7 @@ import xss from 'xss-clean'
 
 import AppError from './utils/appError'
 import globalErrorHandler from './controllers/errorController'
+import authRouter from "./routes/authRoutes";
 
 const app = express()
 
@@ -24,6 +25,8 @@ app.use(express.static(`${__dirname}/public`))
 app.use(mongoSanitize())
 app.use(xss())
 
+
+app.use('/api/v1/auth',authRouter)
 app.all('*',(req, res, next)=>{
     const error = new AppError('Route not found !',404)
     next(error)
