@@ -70,12 +70,26 @@ const sendDevError = (res, err) => {
     })
 }
 const sendProdError = (res, err) => {
-    if (err.name === 'CastError') {
-        return handleCastError(res, err)
-    } else if (err.hasOwnProperty('code') && err['code'] === 11000) {
-        return handleDuplicateError(res, err)
-    } else if (err.hasOwnProperty('errors')) {
-        return handleValidationError(res, err)
+    if(err.isOperational){
+        if (err.name === 'CastError') {
+            return handleCastError(res, err)
+        } else if (err.hasOwnProperty('code') && err['code'] === 11000) {
+            return handleDuplicateError(res, err)
+        } else if (err.hasOwnProperty('errors')) {
+            return handleValidationError(res, err)
+        }else{
+            return res.json({
+                message: err.message,
+                statusCode:err.statusCode,
+                status: 'fail'
+            })
+        }
+    }else{
+        return res.json({
+            message:'Internal server error',
+            status:'error',
+            statusCode:500
+        })
     }
 }
 
