@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 
 import UserModel from '../models/UserModel'
 import asyncHandler from '../utils/asyncHandler'
-import AppError from '../utils/AppError'
+import AppError from '../utils/appError'
 
 const signToken = (id) => {
     return jwt.sign({id}, process.env.JWT_SECRET, {
@@ -15,7 +15,7 @@ const createAndSendToken = (user, statusCode, res) => {
         expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000),
         httpOnly: true
     }
-    if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+    // if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
     res.cookie('jwt', token, cookieOptions)
     user.password = undefined
     res.status(statusCode).json({
@@ -37,7 +37,9 @@ const registerUser = asyncHandler(async (req, res, next) => {
     })
     await newUser.save()
     return res.status(200).json({
-        message: 'done'
+        message: 'Account successfully created !',
+        status:'success',
+        statusCode:200
     })
 })
 const loginUser = asyncHandler(async (req, res, next) => {
@@ -46,7 +48,8 @@ const loginUser = asyncHandler(async (req, res, next) => {
         return next(new AppError('Please provide email and password !', 400))
     }
     const user = await UserModel.findOne({email}).select('+password')
-    if (!user || await user.correctPassword(password, user.password)) {
+
+    if (!user || !await user.correctPassword(password, user.password)) {
         return next(new AppError('Incorrect email or password !', 401))
     }
     createAndSendToken(user, 200, res)
