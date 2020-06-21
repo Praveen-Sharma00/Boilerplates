@@ -6,7 +6,7 @@ import mongoose from 'mongoose'
         path: './config.env'
     })
 
-    const DB_URI = env.NODE_ENV === 'development' ? env.DB_LOCAL_URI : env.DB_PROD_URI
+    const DB_URI = env.NODE_ENV === 'development' ?  env.DB_PROD_URI:env.DB_LOCAL_URI
     try {
         await mongoose.connect(DB_URI, {
             useNewUrlParser: true,
@@ -21,7 +21,7 @@ import mongoose from 'mongoose'
 })(process)
 
 
-import app from './app'
+import app from './src/app'
 
 app.listen(process.env.PORT, () => {
     console.log('Server listening on port ' + process.env.PORT)
